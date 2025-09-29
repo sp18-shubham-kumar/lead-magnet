@@ -31,7 +31,7 @@ This tool doubles as a **lead magnet**: it provides instant insights while captu
 Clone the repo and set up environment:
 
 ```bash
-git clone <>
+git clone <https://github.com/sp18-shubham-kumar/lead-magnet>
 cd lead-magnet
 python -m venv venv
 source venv/bin/activate    # Linux/Mac
@@ -42,7 +42,8 @@ pip install -r requirements.txt
 ```
 ---
 
-# env setup
+## env setup
+```bash
 SECRET_KEY=your-secret-key
 
 #PostgreSQL
@@ -59,6 +60,49 @@ EMAIL_HOST_PASSWORD=your_16_digit-app-password
 DEFAULT_FROM_EMAIL=your_default_from_email
 CELERY_BROKER_URL=your_celery_broker_url
 CELERY_RESULT_BACKEND=your_celery_result_backend
+```
+---
+
+## Run migrations and server
+```bash
+python manage.py migrate
+python manage.py runserver
+```
+---
+
+## Start Celery worker
+```bash
+celery -A lead_magnet worker -l info -P solo
+```
+---
+## Usage Flow
+### Generate Report
+Start on homepage → select Location.
+Choose Role(s) → click verify first.
+Enter Name + Email (+ Company).
+Receive OTP → enter it.
+View/Send full report instantly 🎉
+
+---
+
+### Request New Role/Location
+Submit a request via form.
+Verify with OTP.
+Report delivered to your inbox within 48 hrs.
+
+---
+
+## Data Models
+Lead: Stores Name, Email, Company
+OTPVerification: OTP-based access
+RoleCost: Salary/time benchmark dataset
+ReportHistory: Past reports archive
+PendingRequest: Tracks missing dataset requests
+
+---
+
+## 🎯 Summary
+The Lead Magnet project is more than a calculator: it’s a conversion engine. It captures verified leads while impressing prospects with real savings data—bridging tech + marketing in one neat package.
 
 ---
 
