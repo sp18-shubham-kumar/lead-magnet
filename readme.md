@@ -31,19 +31,21 @@ This tool doubles as a **lead magnet**: it provides instant insights while captu
 Clone the repo and set up environment:
 
 ```bash
-git clone <your-repo-url>
+git clone <>
 cd lead-magnet
 python -m venv venv
 source venv/bin/activate    # Linux/Mac
 venv\Scripts\activate       # Windows
 
 pip install -r requirements.txt
+
+```
 ---
 
-## env setup
+# env setup
 SECRET_KEY=your-secret-key
 
-# PostgreSQL
+#PostgreSQL
 POSTGRES_DB=your_db_name
 POSTGRES_USER=your_db_user
 POSTGRES_PASSWORD=your_db_password
@@ -57,4 +59,7 @@ EMAIL_HOST_PASSWORD=your_16_digit-app-password
 DEFAULT_FROM_EMAIL=your_default_from_email
 CELERY_BROKER_URL=your_celery_broker_url
 CELERY_RESULT_BACKEND=your_celery_result_backend
+
+---
+
 
