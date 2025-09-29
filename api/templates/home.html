@@ -1,0 +1,616 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="hero text-center rounded mb-4">
+  <div class="container">
+    <h1 class="display-5 fw-bold">Hiring Cost Comparison</h1>
+    <p class="lead">Compare Spark Eighteen costs with client locations instantly.</p>
+    <div class="mt-4">
+      <button class="btn btn-lg btn-light me-2" data-bs-toggle="modal" data-bs-target="#calculateModal">
+        Start Calculating
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Calculate Modal -->
+<div class="modal fade" id="calculateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="calcForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Calculate Hiring Cost</h5>
+          <button type="button" class="btn btn-sm btn-outline-danger" id="exitBtn">
+            Close Session
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label class="form-label">Client Location*</label>
+              <select id="calcClientLocation" class="form-select" required></select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Roles (common with Spark Eighteen)*</label>
+              <div class="dropdown w-100">
+                <button id="roleDropdownBtn" class="btn btn-outline-secondary w-100 text-start" type="button" data-bs-toggle="dropdown">
+                  Select Roles <span class="badge bg-primary ms-2" id="roleCount">0</span>
+                </button>
+                <ul class="dropdown-menu w-100" id="calcRoles"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div id="calcResult" class="mt-4" style="display:none"></div>
+
+          
+
+        <div class="modal-footer">
+          <!-- Verify button (visible before OTP verification) -->
+          <button class="btn btn-primary" id="verifyBtn" type="button">Verify First</button>
+
+
+          <!-- Post-OTP buttons (hidden by default, shown after OTP success) -->
+          <div id="postOtpButtons" style="display:none;">
+            <button class="btn btn-primary" id="calcAgainBtn" type="button">Calculate Again</button>
+            <button class="btn btn-outline-primary" id="sendReportBtn" type="button">Send Report via Email</button>
+            <button class="btn btn-info" id="viewReportsBtn" type="button">See Previous Reports</button>
+          </div>
+
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+        </div> 
+      </form>
+      <div class="mt-3 text-center">
+            <p class="text-muted">
+              Didn't find the role or location you're looking for?  
+              <button class="btn btn-link p-0" id="openPendingRequest" type="button">
+                Click here to request it.
+              </button>
+            </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Verification Modal -->
+<div class="modal fade" id="verifyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="verifyForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Verify Your Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Name*</label><input type="text" id="vName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Email*</label><input type="email" id="vEmail" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Company </label><input type="text" id="vCompany" class="form-control" required></div>
+          <button type="button" id="sendOtpBtn" class="btn btn-primary">Send OTP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="otpForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Enter OTP</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="otpInput" class="form-control mb-2" placeholder="Enter OTP" required>
+          <small id="otpAttemptsMsg" class="text-danger small mb-2" style="display:none;"></small>
+          <button type="submit" class="btn btn-success w-100">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Previous Reports Modal -->
+<div class="modal fade" id="reportsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Previous Sent Reports</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="reportsList">
+        <!-- Reports will be injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Request Modal -->
+<div class="modal fade" id="pendingRequestModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="pendingRequestForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Request For Missing Role/Location</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Name*</label><input type="text" id="prName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Email*</label><input type="email" id="prEmail" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Company</label><input type="text" id="prCompany" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Location*</label><input type="text" id="prLocation" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Roles (Format: role - level (exp))*</label>
+            <textarea id="prRoles" class="form-control" rows="3" placeholder="e.g., Backend Developer - Junior (0-2), etc"></textarea>
+          </div>
+          <button type="button" id="prSendOtpBtn" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Request OTP Modal -->
+<div class="modal fade" id="pendingOtpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="pendingOtpForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Enter OTP for Pending Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="pendingOtpInput" class="form-control mb-2" placeholder="Enter OTP" required>
+          <small id="pendingOtpAttemptsMsg" class="text-danger small mb-2" style="display:none;"></small>
+          <button type="submit" class="btn btn-success w-100">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ========= Load Locations =========
+  async function loadLocations() {
+    const res = await fetch('/api/v1/locations/');
+    const locations = (await res.json()).data || [];
+    const select = document.getElementById('calcClientLocation');
+    select.innerHTML = '<option value="">Select client location</option>';
+    locations.forEach(x => {
+      select.insertAdjacentHTML(
+        'beforeend',
+        `<option value="${x.id}">${x.country_name}</option>`
+      );
+    });
+  }
+  loadLocations();
+
+  // ========= Load Roles =========
+  async function loadRoles() {
+    const client = document.getElementById('calcClientLocation').value;
+    const roleList = document.getElementById('calcRoles');
+    const roleCount = document.getElementById('roleCount');
+
+    if (!client) {
+      roleList.innerHTML = '<li class="dropdown-item text-muted">Select client location first</li>';
+      roleCount.textContent = "0";
+      return;
+    }
+
+    const r = await fetch(`/web/reports/available-roles/?from_location=${client}`);
+    const roles = (await r.json()).data || [];
+    roleList.innerHTML = '';
+    roleCount.textContent = "0";
+
+    roles.forEach(x => {
+      roleList.insertAdjacentHTML(
+        'beforeend',
+        `<li>
+           <label class="dropdown-item">
+             <input type="checkbox" class="form-check-input me-2 role-checkbox" value="${x.id}">
+             ${x.name} — ${x.level} (${x.experience_min}-${x.experience_max} yrs)
+           </label>
+         </li>`
+      );
+    });
+
+    roleList.querySelectorAll('.role-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        roleCount.textContent = roleList.querySelectorAll('.role-checkbox:checked').length;
+      });
+    });
+  }
+  document.getElementById('calcClientLocation').addEventListener('change', loadRoles);
+
+  let latestReportId = null;
+  let leadEmail = null;
+  let otpVerifiedAt = null;
+
+  // ========= Calculation =========
+  async function runCalculation() {
+    const location = document.getElementById("calcClientLocation").value;
+    const selectedRoles = [...document.querySelectorAll("#calcRoles input:checked")]
+                           .map(cb => Number(cb.value));
+
+    if (!location || selectedRoles.length === 0) {
+      alert("Please select a location and at least one role.");
+      return;
+    }
+
+    if (!leadEmail) {
+      alert("Please verify your email first.");
+      return;
+    }
+
+    try {
+      const payload = { from_location: Number(location), roles: selectedRoles, lead_email: leadEmail };
+      const res = await fetch("/web/reports/calculate/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const respJson = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        console.error("Calculate failed", res.status, respJson);
+        const serverMsg =
+          respJson?.error?.detail ||
+          respJson?.message ||
+          (respJson?.data && (respJson.data.detail || JSON.stringify(respJson.data))) ||
+          JSON.stringify(respJson) || "Unknown error";
+        alert("Calculation failed: " + serverMsg);
+        return;
+      }
+
+      const data = respJson?.data || respJson;
+      latestReportId = data?.report_id || latestReportId;
+
+      let totalUsd = 0;
+      let locationName = data.items.length > 0 ? data.items[0].from_location_name : "";
+      let html = `
+        <h5 class="mb-3">Report Generated</h5>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-light">
+            <tr>
+              <th>Role</th>
+              <th>Experience</th>
+              <th>Client Cost pa (USD)</th>
+              <th>Spark18 Cost pa (USD)</th>
+              <th>Savings pa (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      (data.items || []).forEach(item => {
+        const savingUsd = parseFloat(item.savings_usd || 0).toFixed(2);
+        const sparkUsd  = parseFloat(item.sp18_cost_usd || 0).toFixed(2);
+        const clientUsd = parseFloat(item.from_cost_usd || 0).toFixed(2);
+
+        totalUsd += parseFloat(item.savings_usd || 0) || 0;
+        const savingUsdClass = (Number(item.savings_usd) >= 0) ? "text-success fw-bold" : "text-danger fw-bold";
+
+        html += `
+          <tr>
+            <td>${item.role_name} (${item.role_level})</td>
+            <td>${item.role_exp_min}-${item.role_exp_max} Yrs</td>
+            <td>${clientUsd}</td>
+            <td>${sparkUsd}</td>
+            <td class="${savingUsdClass}">${savingUsd}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table></div>`;
+      html = `
+        <div class="card p-3 mb-3">
+          <strong>Client Location:</strong> ${locationName}<br>
+          <strong>Total Savings:</strong> ${totalUsd.toFixed(2)} USD
+        </div>
+      ` + html;
+
+      document.getElementById("calcResult").style.display = "block";
+      document.getElementById("calcResult").innerHTML = html;
+      document.getElementById("postOtpButtons").style.display = "block";
+
+    } catch (err) {
+      console.error("Calculation exception", err);
+      alert("Something went wrong while calculating. See console for details.");
+    }
+  }
+
+  // ========= OTP Flow =========
+  document.getElementById("verifyBtn").addEventListener("click", () => {
+    new bootstrap.Modal(document.getElementById("verifyModal")).show();
+  });
+
+  const leadData = { email: "", name: "", company: "" };
+
+  document.getElementById("sendOtpBtn").addEventListener("click", async () => {
+    leadData.name = document.getElementById("vName").value.trim();
+    leadData.email = document.getElementById("vEmail").value.trim();
+    leadData.company = document.getElementById("vCompany").value.trim();
+
+    if (!leadData.name || !leadData.email) {
+      alert("Please enter name and email");
+      return;
+    }
+
+    const res = await fetch("/web/reports/send-otp/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(leadData)
+    });
+
+    if (res.ok) {
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("verifyModal")).hide();
+      new bootstrap.Modal(document.getElementById("otpModal")).show();
+      alert("OTP sent to your email.");
+    } else {
+      const err = await res.json().catch(() => ({}));
+      alert("Failed to send OTP: " + (err?.message || "Unknown error"));
+    }
+  });
+
+  document.getElementById("otpForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const otp = document.getElementById("otpInput").value.trim();
+
+    const verifyRes = await fetch("/web/reports/verify-otp/", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ ...leadData, otp_code: otp })
+    });
+
+    const resp = await verifyRes.json().catch(() => ({}));
+
+    if (verifyRes.ok) {
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("otpModal")).hide();
+      alert("OTP verified successfully! Now you can calculate.");
+
+      leadEmail = leadData.email;
+      otpVerifiedAt = new Date();
+      document.getElementById("verifyBtn").style.display = "none";
+      document.getElementById("postOtpButtons").style.display = "block";
+      new bootstrap.Modal(document.getElementById("calculateModal")).show();
+      await runCalculation();
+
+    } else {
+      document.getElementById("otpAttemptsMsg").style.display = "block";
+      if (verifyRes.status === 403) {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("otpModal")).hide();
+        alert("You have exceeded your OTP attempts. Please request a new OTP.");
+        new bootstrap.Modal(document.getElementById("verifyModal")).show();
+      }
+
+      const attemptsLeft = resp?.data?.attempts_left;
+      if (attemptsLeft !== undefined && attemptsLeft !== null && attemptsLeft >= 0) {
+          document.getElementById("otpAttemptsMsg").innerText = 
+            `Invalid Otp. You have ${attemptsLeft} attempt(s) left.`;
+      }else{
+        document.getElementById("otpAttemptsMsg").innerText = resp?.message || "OTP Verification Failed";
+      }
+
+    }
+  });
+
+  // ========= Buttons =========
+  document.getElementById("calcAgainBtn").addEventListener("click", runCalculation);
+
+  document.getElementById("sendReportBtn").addEventListener("click", async () => {
+    if (!latestReportId) { alert("No report calculated yet"); return; }
+    const res = await fetch("/web/reports/send-report/", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ email: leadEmail, report_id: latestReportId })
+    });
+    if (res.ok) alert("Report will be sent to your email");
+  });
+
+  // ========= View Reports =========
+  document.getElementById("viewReportsBtn").addEventListener("click", async () => {
+    if (!leadEmail) { alert("Please verify your email first."); return; }
+    const res = await fetch(`/web/reports/prev-reports/?email=${encodeURIComponent(leadEmail)}`);
+    const data = await res.json();
+    const reports = data?.data || [];
+    const listDiv = document.getElementById("reportsList");
+
+    if (reports.length === 0) {
+      listDiv.innerHTML = "<p>No previous reports found.</p>";
+    } else {
+      let html = "";
+      reports.forEach((r, idx) => {
+        let totalSavings = 0;
+        let locationName = r.items.length > 0 ? r.items[0].from_location_name : "";
+
+        html += `
+          <div class="mb-4">
+            <h6>Report #${idx + 1}</h6>
+            <p>
+              <strong>Created At:</strong> ${formatToLocal(r.created_at)}<br>
+              <strong>Last Sent At:</strong> ${formatToLocal(r.sent_at)}<br>
+              <strong>Client Location:</strong> ${locationName}<br>
+            </p>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                    <th>Role</th>
+                    <th>Level</th>
+                    <th>Experience</th>
+                    <th>Client Cost pa (USD)</th>
+                    <th>Spark18 Cost pa (USD)</th>
+                    <th>Savings pa (USD)</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+
+        (r.items || []).forEach(item => {
+          totalSavings += parseFloat(item.savings_usd || 0);
+          const savingClass = item.savings_usd >= 0 ? "text-success fw-bold" : "text-danger fw-bold";
+          html += `
+            <tr>
+              <td>${item.role_name}</td>
+              <td>${item.role_level}</td>
+              <td>${item.role_exp_min}-${item.role_exp_max} yrs</td>
+              <td>${parseFloat(item.from_cost_usd).toFixed(2)}</td>
+              <td>${parseFloat(item.sp18_cost_usd).toFixed(2)}</td>
+              <td class="${savingClass}">${parseFloat(item.savings_usd).toFixed(2)}</td>
+            </tr>
+          `;
+        });
+
+        html += `
+                </tbody>
+              </table>
+              <div class="alert alert-info">
+                <strong>Total Savings:</strong> ${totalSavings.toFixed(2)} USD
+              </div>
+            </div>
+            ${r.status === "sent" ? `<button class="btn btn-sm btn-outline-primary resend-btn" data-report-id="${r.id}">Resend Report</button>` : ""}
+          </div>
+        `;
+      });
+
+      listDiv.innerHTML = html;
+      document.querySelectorAll(".resend-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const reportId = btn.getAttribute("data-report-id");
+          const resendRes = await fetch("/web/reports/send-report/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: leadEmail, report_id: reportId })
+          });
+          if (resendRes.ok) alert("Report will be sent to your email");
+        });
+      });
+    }
+
+    new bootstrap.Modal(document.getElementById("reportsModal")).show();
+  });
+
+  // ========= Exit =========
+  document.getElementById("exitBtn").addEventListener("click", () => {
+    leadEmail = null; 
+    latestReportId = null;
+    window.location.reload();
+  });
+
+  // ========= Pending Request =========
+  let prData = { name: "", email: "", company: "", location: "", roles: "" };
+
+  document.getElementById("openPendingRequest").addEventListener("click", () => {
+    setTimeout(() => {
+      new bootstrap.Modal(document.getElementById("pendingRequestModal")).show();
+    }, 300);
+  });
+
+  document.getElementById("prSendOtpBtn").addEventListener("click", async () => {
+    prData = {
+      name: document.getElementById("prName").value.trim(),
+      email: document.getElementById("prEmail").value.trim(),
+      company: document.getElementById("prCompany").value.trim(),
+      location: document.getElementById("prLocation").value.trim(),
+      roles: document.getElementById("prRoles").value.trim()
+    };
+
+    if (!prData.name || !prData.email || !prData.location || !prData.roles) {
+      alert("Please fill in Name, Email, Location and Roles.");
+      return;
+    }
+
+    if (leadEmail && leadEmail === prData.email && otpVerifiedAt) {
+      const diffMins = (new Date() - otpVerifiedAt) / (1000 * 60);
+      if (diffMins <= 60) {
+        const submitRes = await fetch("/web/pending-request/", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify(prData)
+        });
+        if (submitRes.ok) {
+          alert("Request submitted successfully. You will get your report in 48 hours");
+          bootstrap.Modal.getOrCreateInstance(document.getElementById("pendingRequestModal")).hide();
+        }
+        return;
+      }
+    }
+
+    const res = await fetch("/web/pending-request/send-otp/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ name: prData.name, email: prData.email, company: prData.company })
+    });
+
+    if (res.ok) {
+      alert("OTP sent to your email. Please check your inbox.");
+      new bootstrap.Modal(document.getElementById("pendingOtpModal")).show();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      alert("Failed to send OTP: " + (err?.message || "Unknown error"));
+    }
+  });
+
+      document.getElementById("pendingOtpForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const otp = document.getElementById("pendingOtpInput").value.trim();
+
+        const verifyRes = await fetch("/web/pending-request/verify-otp/", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ email: prData.email, otp_code: otp })
+        });
+
+        const resp = await verifyRes.json().catch(() => ({}));
+
+        if (verifyRes.ok) {
+          bootstrap.Modal.getOrCreateInstance(document.getElementById("pendingOtpModal")).hide();
+          alert("OTP verified successfully! Submitting your request...");
+          const submitRes = await fetch("/web/pending-request/", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify(prData)
+          });
+          if (submitRes.ok) {
+            alert("Request submitted successfully. You will get your report in 48 hours");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("pendingRequestModal")).hide();
+          }
+        } else {
+          document.getElementById("pendingOtpAttemptsMsg").style.display = "block";
+          if (verifyRes.status === 403) {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("pendingOtpModal")).hide();
+            alert("Too many failed attempts. Please request OTP again.");
+            new bootstrap.Modal(document.getElementById("pendingRequestModal")).show();
+          }
+          const attemptsLeft = resp?.data?.attempts_left;
+          if (attemptsLeft !== undefined && attemptsLeft !== null && attemptsLeft >= 0) {
+              document.getElementById("pendingOtpAttemptsMsg").innerText = 
+                `Invalid Otp. You have ${attemptsLeft} attempt(s) left.`;
+          }else{
+          document.getElementById("pendingOtpAttemptsMsg").innerText = resp?.message || "OTP verification failed";  
+        }
+      
+    }
+  });
+
+  // ========= Helpers =========
+  function formatToLocal(utcString) {
+    if (!utcString) return "-";
+    const date = new Date(utcString);
+    return date.toLocaleString("en-IN", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+      hour12: true, timeZoneName: "short"
+    });
+  }
+});
+</script>
+
+{% endblock %}
+

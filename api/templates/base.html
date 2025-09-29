@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lead Magnet</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 72px; }
+    .hero { background: linear-gradient(90deg,#4f46e5 0%, #06b6d4 100%); color: #fff; padding: 48px 0; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">Lead Magnet</a>
+
+    <!-- ✅ Mobile toggler button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- ✅ Collapsible menu with ID -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        {% if request.user.is_authenticated and request.user.is_staff %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'admin-dashboard' %}">Admin Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'admin-logout' %}">Logout</a></li>
+        {% else %}
+          <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'admin-login' %}">Admin Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-question-circle-fill me-2"></i> How to Use This Site</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <!-- Section 1: Generating Reports -->
+        <h6 class="fw-bold text-primary"><i class="bi bi-bar-chart-fill me-2"></i> Generating a Cost Comparison Report</h6>
+        <ol class="list-group list-group-numbered mb-4">
+          <li class="list-group-item">Click <strong>Start Calculating</strong> on the home page.</li>
+          <li class="list-group-item">
+            Choose a <strong>Client Location</strong> from the dropdown.  
+            <small class="text-muted d-block">You need to pick a location first to see available roles in that region (and Spark Eighteen).</small>
+          </li>
+          <li class="list-group-item">Select one or more <strong>Roles</strong> you want to compare.</li>
+          <li class="list-group-item">Click <strong class="text-primary">Verify First</strong> and enter your name, email, and (optional) company.</li>
+          <li class="list-group-item"><i class="bi bi-envelope-fill text-success me-1"></i> You'll receive an <strong>OTP</strong> in your email. Enter it to verify.</li>
+          <li class="list-group-item">Once verified ✅, your cost comparison report will be shown instantly.</li>
+          <li class="list-group-item">You can:  
+            <ul class="mt-2">
+              <li><strong>Calculate Again ↺</strong> - to generate another report</li>
+              <li><strong>Send Report via Email 📧</strong> - to get it in your inbox</li>
+              <li><strong>See Previous Reports 📂</strong> - view or resend older reports</li>
+            </ul>
+          </li>
+        </ol>
+
+        <!-- Section 2: Requesting New Roles/Locations -->
+        <h6 class="fw-bold text-primary"><i class="bi bi-lightbulb-fill me-2"></i> Requesting New Roles or Locations</h6>
+        <ol class="list-group list-group-numbered mb-4">
+          <li class="list-group-item">If you don't find the role/location you need, click <strong class="text-primary">Click here to request it</strong>. (Appears at the bottom, After clicking the <strong>Start Calculating</strong> button in home page.)</li>
+          <li class="list-group-item">Fill out the form with your details and the missing role/location you need.</li>
+          <li class="list-group-item">Click <strong>Submit</strong>.  
+            <i class="bi bi-envelope text-success ms-1"></i> An OTP will be sent to your email.
+          </li>
+          <li class="list-group-item">Enter the OTP to verify your request.</li>
+          <li class="list-group-item">Your request will be submitted ✅, and you'll get the final report by email within <strong>48 hours</strong>.</li>
+        </ol>
+
+        <!-- Tips -->
+        <div class="alert alert-info mt-3">
+          <i class="bi bi-info-circle-fill me-2"></i> 
+          <strong>Tips:</strong>
+          <ul class="mb-0">
+            <li>If you enter the wrong OTP too many times, request a new one.</li>
+            <li>Expired OTPs won't work ⏳ - always use the latest one from your email.</li>
+            <li>If something looks stuck, try refreshing the site 🔄.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

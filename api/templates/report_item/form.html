@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>{% if item %}Edit{% else %}Add{% endif %} Report Item (Report #{{ report.id }})</h2>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Role</label>
+      {{ form.role }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">From Location</label>
+      {{ form.from_location }}
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Spark Eighteen (USD)</label>
+        {{ form.sp18_cost_usd }}
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Client (USD)</label>
+        {{ form.from_cost_usd }}
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Savings (USD)</label>
+        {{ form.savings_usd}}
+      </div>
+    </div>
+    <button class="btn btn-success" type="submit">Save</button>
+    <a href="{% url 'reporthistory-detail' report.id %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

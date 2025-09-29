@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Role Cost Details</h2>
+<ul class="list-group mb-3">
+  <li class="list-group-item"><strong>Role:</strong> {{ rolecost.role }}</li>
+  <li class="list-group-item"><strong>Location:</strong> {{ rolecost.location }}</li>
+  <li class="list-group-item"><strong>Cost (USD):</strong> {{ rolecost.cost_usd }}</li>
+</ul>
+<a href="{% url 'rolecost-update' rolecost.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'rolecost-list' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

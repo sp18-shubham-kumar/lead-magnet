@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Report Item #{{ item.id }}</h2>
+  <p><strong>Role:</strong> {{ item.role }}</p>
+  <p><strong>From Location:</strong> 
+    {% if item.from_location %}
+      {{ item.from_location.country_name }}
+    {% else %}
+      -
+    {% endif %}
+  </p>
+  <p><strong>SP18 (USD):</strong> {{ item.sp18_cost_usd }}</p>
+  <p><strong>Client (USD):</strong> {{ item.from_cost_usd }}</p>
+  <p><strong>Savings (USD):</strong> {{ item.savings_usd }}</p>
+
+  <a href="{% url 'reporthistory-detail' report.id %}" class="btn btn-secondary">Back</a>
+  <a href="{% url 'reportitem-update' report.id item.id %}" class="btn btn-warning">Edit</a>
+  <a href="{% url 'reportitem-delete' report.id item.id %}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock %}

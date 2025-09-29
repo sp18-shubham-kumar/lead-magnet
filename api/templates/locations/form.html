@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if location %}Edit{% else %}Add{% endif %} Location</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="country_name" class="form-label">Country Name</label>
+    <input type="text" class="form-control" id="country_name" name="country_name"
+           value="{{ location.country_name|default:'' }}" required>
+  </div>
+  <button type="submit" class="btn btn-success">Save</button>
+  <a href="{% url 'location-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

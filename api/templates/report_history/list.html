@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Reports</h2>
+    <a href="{% url 'reporthistory-create' %}" class="btn btn-primary">Create Report</a>
+  </div>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Lead Email</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Sent At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{% if r.lead %}{{ r.lead.email }}{% else %}-{% endif %}</td>
+        <td>
+          {% if r.status == "queued" %}
+            <span class="badge bg-secondary">Draft</span>
+          {% elif r.status == "sent" %}
+            <span class="badge bg-success">Sent</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">{{ r.status }}</span>
+          {% endif %}
+        </td>
+        <td><span class="utc-to-local" data-utc="{{ r.created_at|date:'c' }}"></span></td>
+        <td><span class="utc-to-local" data-utc="{{ r.sent_at|date:'c'}}"></span></td>
+
+
+        <td>
+          <a href="{% url 'reporthistory-detail' r.id %}" class="btn btn-sm btn-info">View</a>
+          <a href="{% url 'reporthistory-delete' r.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No reports found.</td></tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+</div>
+
+<script>
+function formatToLocal(utcString) {
+  if (!utcString) return "-";
+  const date = new Date(utcString);
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short"
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".utc-to-local").forEach(el => {
+    const utc = el.getAttribute("data-utc");
+    el.textContent = formatToLocal(utc);
+  });
+});
+</script>
+
+{% endblock %}

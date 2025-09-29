@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if role %}Edit Role{% else %}Add Role{% endif %}</h2>
+
+<form method="post">
+  {% csrf_token %}
+    <div class="mb-2">
+        <label>Role</label>
+        <input name="role" class="form-control" value="{{ role.role|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-2">
+        <label>Level</label>
+        <input name="level" class="form-control" value="{{ role.level|default_if_none:'' }}" required>
+    </div>
+        <div class="mb-2">
+        <label>Min Experience</label>
+        <input name="experience_min" type="number" class="form-control" value="{{ role.experience_min|default_if_none:'' }}" required>
+    </div>
+    <div class="mb-2">
+        <label>Max Experience</label>
+        <input name="experience_max" type="number" class="form-control" value="{{ role.experience_max|default_if_none:'' }}" required>
+    </div>
+  <button type="submit" class="btn btn-success">Save</button>
+  <a href="{% url 'role-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
+
+
+
+
+
+
+
+
+         

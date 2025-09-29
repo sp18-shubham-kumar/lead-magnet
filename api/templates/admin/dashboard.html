@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Roles</h5>
+      <p>View, add, edit, bulk upload</p>
+      <a href="{% url 'role-list' %}" class="btn btn-outline-primary">Open Roles</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Locations</h5>
+      <p>View, add, edit, bulk upload</p>
+      <a href="{% url 'location-list' %}" class="btn btn-outline-primary">Open Locations</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Role Costs</h5>
+      <p>Manage role costs per location</p>
+      <a href="{% url 'rolecost-list' %}" class="btn btn-outline-primary">Open Role Costs</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Reports</h5>
+      <p>Manage generated reports</p>
+      <a href="{% url 'reporthistory-list' %}" class="btn btn-outline-primary">Open Reports</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Leads</h5>
+      <p>View, add, edit, delete</p>
+      <a href="{% url 'lead-list' %}" class="btn btn-outline-primary">Open Leads</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Verifications</h5>
+      <p>View</p>
+      <a href="{% url 'otp-list' %}" class="btn btn-outline-primary">Open Verifications</a>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card card-hover p-3">
+      <h5>Pending Requests</h5>
+      <p>View</p>
+      <a href="{% url 'pending-requests-list' %}" class="btn btn-outline-primary">Open Pending Requests</a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

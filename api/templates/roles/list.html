@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Roles</h2>
+  {% if request.user.is_authenticated and request.user.is_staff %}
+    <div>
+      <!-- Add Role Modal Trigger -->
+      <a href="{% url 'role-create' %}" class="btn btn-primary">Add Role</a>
+      <!-- Bulk Upload Modal Trigger -->
+      <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#bulkRoleModal">Bulk Upload</button>
+    </div>
+  {% endif %}
+</div>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Role</th>
+      <th>Level</th>
+      <th>Exp (min-max)</th>
+      
+      {% if request.user.is_authenticated and request.user.is_staff %}
+        <th>Last Updated At</th>
+        <th>Actions</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for role in roles %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ role.role }}</td>
+      <td>{{ role.level }}</td>
+      <td>{{ role.experience_min }} - {{ role.experience_max }}</td>
+      
+      {% if request.user.is_authenticated and request.user.is_staff %}
+        <td><span class="utc-to-local" data-utc="{{ role.updated_at|date:'c' }}"></span></td>
+
+        <td>
+          <a href="{% url 'role-detail' role.id %}" class="btn btn-sm btn-info">View</a>
+          <a href="{% url 'role-update' role.id %}" class="btn btn-sm btn-warning">Edit</a>
+          <a href="{% url 'role-delete' role.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+      {% endif %}
+      
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Bulk Upload Modal -->
+<div class="modal fade" id="bulkRoleModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'role-upload' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Bulk Upload Roles (.xlsx)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="file" name="file" accept=".xlsx" required>
+          <div class="form-text">
+            Excel columns: Role, Level, Experience Min, Experience Max
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatToLocal(utcString) {
+  if (!utcString) return "-";
+  const date = new Date(utcString);
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short"
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".utc-to-local").forEach(el => {
+    const utc = el.getAttribute("data-utc");
+    el.textContent = formatToLocal(utc);
+  });
+});
+</script>
+
+{% endblock %}
+

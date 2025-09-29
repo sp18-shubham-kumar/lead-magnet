@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Role Details</h2>
+<ul class="list-group mb-3">
+  <li class="list-group-item"><strong>Role:</strong> {{ role.role }}</li>
+  <li class="list-group-item"><strong>Level:</strong> {{ role.level }}</li>
+  <li class="list-group-item"><strong>Experience_Min:</strong> {{ role.experience_min }}</li>
+  <li class="list-group-item"><strong>Experience_Max:</strong> {{ role.experience_max }}</li>
+</ul>
+<a href="{% url 'role-update' role.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'role-list' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

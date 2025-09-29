@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Report #{{ report.id }}</h2>
+    <div>
+      <a href="{% url 'reporthistory-list' %}" class="btn btn-secondary">Back</a>
+      <a href="{% url 'reporthistory-delete' report.id %}" class="btn btn-danger">Delete Report</a>
+    </div>
+  </div>
+
+  <p><strong>Lead Email:</strong> 
+    {% if report.lead %}
+      {{ report.lead.email }}
+    {% else %}
+      -
+    {% endif %}
+  </p>
+  <p><strong>Created:</strong> {{ report.created_at }}</p>
+  <p>
+    <strong>File:</strong>
+    {% if report.report_file %}
+      <a href="{{ report.report_file.url }}" target="_blank">Download file</a>
+    {% else %}
+      None
+    {% endif %}
+  </p>
+  <p><strong>Status:</strong>
+    {% if report.status == "queued" %}
+      <span class="badge bg-secondary">Draft</span>
+    {% elif report.status == "sent" %}
+      <span class="badge bg-success">Sent</span>
+    {% elif report.status == "failed" %}
+      <span class="badge bg-danger">Failed</span>
+    {% else %}
+      <span class="badge bg-warning text-dark">{{ report.status }}</span>
+    {% endif %}
+  </p>
+  <p><strong>Created:</strong> {{ report.created_at }}</p>
+  <p><strong>Sent At:</strong> {{ report.sent_at|default:"-" }}</p>
+
+  <hr>
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h4>Items</h4>
+    <a href="{% url 'reportitem-create' report.id %}" class="btn btn-primary btn-sm">Add Item</a>
+  </div>
+
+  {% if items %}
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Role</th>
+          <th>From Location</th>
+          <th>SP18 (USD)</th>
+          <th>Client (USD)</th>
+          <th>Savings (USD)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ it.role }}</td>
+          <td>
+            {% if it.from_location %}
+              {{ it.from_location.country_name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>{{ it.sp18_cost_usd }}</td>
+          <td>{{ it.from_cost_usd }}</td>
+          <td>{{ it.savings_usd }}</td>
+          <td>
+            <a href="{% url 'reportitem-detail' report.id it.id %}" class="btn btn-sm btn-info">View</a>
+            <a href="{% url 'reportitem-update' report.id it.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'reportitem-delete' report.id it.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No items yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

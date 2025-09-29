@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if rolecost %}Edit Role Cost{% else %}Add Role Cost{% endif %}</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-2">
+    <label>Role</label>
+    <select name="role" class="form-control" required>
+      {% for role in roles %}
+        <option value="{{ role.id }}" {% if rolecost and rolecost.role.id == role.id %}selected{% endif %}>{{ role }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-2">
+    <label>Location</label>
+    <select name="location" class="form-control" required>
+      {% for loc in locations %}
+        <option value="{{ loc.id }}" {% if rolecost and rolecost.location.id == loc.id %}selected{% endif %}>{{ loc.country_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-2">
+    <label>Cost (USD)</label>
+    <input name="cost_usd" type="number" step="0.01" class="form-control" value="{{ rolecost.cost_usd|default:'' }}" required>
+  </div>
+  <button type="submit" class="btn btn-success">Save</button>
+  <a href="{% url 'rolecost-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

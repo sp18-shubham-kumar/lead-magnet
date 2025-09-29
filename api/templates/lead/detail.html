@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Lead Details</h2>
+<ul class="list-group mb-3">
+  <li class="list-group-item"><strong>Name:</strong> {{ lead.name }}</li>
+  <li class="list-group-item"><strong>Email:</strong> {{ lead.email }}</li>
+  <li class="list-group-item"><strong>Company:</strong> {{ lead.company }}</li>
+</ul>
+<a href="{% url 'lead-update' lead.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'lead-list' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

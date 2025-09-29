@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Report Items for Report #{{ report.id }}</h2>
+
+  <!-- Create New Report Item -->
+    <form method="post" action="{% url 'reportitem-create' report.id %}">
+    {% csrf_token %}
+
+    <!-- Role Dropdown -->
+    <div class="mb-3">
+        <label for="role">Select Role</label>
+        <select name="role" id="role" class="form-select" required>
+        <option value="" disabled selected>-- Choose Role --</option>
+        {% for role in roles %}
+            <option value="{{ role.id }}">{{ role.role }} ({{ role.level }})</option>
+        {% endfor %}
+        </select>
+    </div>
+
+    <!-- Location Dropdown -->
+    <div class="mb-3">
+        <label for="from_location">Select Client Location</label>
+        <select name="from_location" id="from_location" class="form-select" required>
+        <option value="" disabled selected>-- Choose Location --</option>
+        {% for loc in locations %}
+            {% if loc.country_name != "Spark Eighteen" %}
+            <option value="{{ loc.id }}">{{ loc.country_name }}</option>
+            {% endif %}
+        {% endfor %}
+        </select>
+    </div>
+
+    <!-- From Cost -->
+    <div class="mb-3">
+        <label for="from_cost_usd">Client Cost (USD)</label>
+        <input type="number" step="0.01" id="from_cost_usd" name="from_cost_usd" class="form-control" required>
+    </div>
+
+    <!-- Spark18 Cost -->
+    <div class="mb-3">
+        <label for="sp18_cost_usd">Spark18 Cost (USD)</label>
+        <input type="number" step="0.01" id="sp18_cost_usd" name="sp18_cost_usd" class="form-control" required>
+    </div>
+
+    <!-- Savings (Auto-calculated) -->
+    <div class="mb-3">
+        <label for="savings_usd">Savings (USD)</label>
+        <input type="number" step="0.01" id="savings_usd" name="savings_usd" class="form-control" readonly>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Item</button>
+    </form>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const fromCost = document.getElementById("from_cost_usd");
+    const sp18Cost = document.getElementById("sp18_cost_usd");
+    const savings = document.getElementById("savings_usd");
+
+    function calculateSavings() {
+        const fromVal = parseFloat(fromCost.value) || 0;
+        const sp18Val = parseFloat(sp18Cost.value) || 0;
+        savings.value = (fromVal - sp18Val).toFixed(2);
+    }
+
+    fromCost.addEventListener("input", calculateSavings);
+    sp18Cost.addEventListener("input", calculateSavings);
+    });
+    </script>
+
+
+
+  <!-- List Items -->
+  <table class="table table-bordered mt-4">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Role</th>
+        <th>From Location</th>
+        <th>Client Cost</th>
+        <th>Spark Cost</th>
+        <th>Savings</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.role.role }} ({{ item.role.level }})</td>
+        <td>{{ item.from_location.country_name }}</td>
+        <td>{{ item.from_cost_usd }}</td>
+        <td>{{ item.sp18_cost_usd }}</td>
+        <td>{{ item.savings_usd }}</td>
+        <td>
+          <a href="{% url 'reportitem-detail' report.id item.id %}" class="btn btn-sm btn-info">View</a>
+          <form method="post" action="{% url 'reportitem-detail' report.id item.id %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

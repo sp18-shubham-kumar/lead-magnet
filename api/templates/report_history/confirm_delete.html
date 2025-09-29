@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h3>Delete Report</h3>
+  <p>Are you sure you want to delete report #{{ report.id }}?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Yes, delete</button>
+    <a href="{% url 'reporthistory-detail' report.id %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

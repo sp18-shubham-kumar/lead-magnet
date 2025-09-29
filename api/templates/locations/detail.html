@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Location Details</h2>
+<p><strong>ID:</strong> {{ location.id }}</p>
+<p><strong>Country Name:</strong> {{ location.country_name }}</p>
+
+<a href="{% url 'location-update' location.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'location-delete' location.id %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'location-list' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}

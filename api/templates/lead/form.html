@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if lead %}Edit Lead{% else %}Add Lead{% endif %}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Name</label>
+    <input type="text" name="name" class="form-control" value="{{ lead.name|default:'' }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Email</label>
+    <input type="email" name="email" class="form-control" value="{{ lead.email|default:'' }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Company</label>
+    <input type="text" name="company" class="form-control" value="{{ lead.company|default:'' }}">
+  </div>
+  <button type="submit" class="btn btn-success">Save</button>
+  <a href="{% url 'lead-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
