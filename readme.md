@@ -31,7 +31,7 @@ This tool doubles as a **lead magnet**: it provides instant insights while captu
 Clone the repo and set up environment:
 
 ```bash
-git clone <https://github.com/sp18-shubham-kumar/lead-magnet>
+git clone <https://github.com/sp18-shubham-kumar/lead-magnet.git>
 cd lead-magnet
 python -m venv venv
 source venv/bin/activate    # Linux/Mac
